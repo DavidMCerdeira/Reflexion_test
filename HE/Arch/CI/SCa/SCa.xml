@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<component name="CA">
+		<properties>
+			<property type="int" name="Pa">
+				<defaultValue value="2"/>
+			</property>
+			<property type="int" name="Pe">
+				<defaultValue value="3"/>
+			</property>
+		</properties>
+	</component>
+
