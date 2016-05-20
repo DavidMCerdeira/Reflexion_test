@@ -12,11 +12,15 @@ import reflexion_test.SpecificConfigReader;
 
 public class Main {
 	public static void main(String[] args) {
+		
 		SpecificLoader sl = new SpecificLoader("");
 		
 		SpecificConfigReader er = null;
+		ConfigReader cr = null;
 		try {
-			er = new ConfigReader("").getConfigReader("CI.SCa");
+			cr = new ConfigReader("");
+			er = cr.getConfigReader("CI.SCa");
+			System.out.println("array is of size: " + cr.getArrayListSize("CI.array"));
 		} catch (ParserConfigurationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

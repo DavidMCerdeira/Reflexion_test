@@ -3,14 +3,15 @@ import reflexion_test.SpecificConfigReader;
 
 
 //must be public
-public class P8051 extends Processor {
+public class P8051 extends AbstractProcessor {
 	
 	int i2cClk;
 	int spiClk;
 	SpecificConfigReader ConfRdr;
+	Processor P;//model object
 
-	public P8051(){
-		
+	public P8051(Processor p){
+		P = p;
 	}
 	
 	public void setConfigReader(SpecificConfigReader cr){

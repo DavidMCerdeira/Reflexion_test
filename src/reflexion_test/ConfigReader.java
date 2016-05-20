@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -113,7 +114,7 @@ public class ConfigReader {
 
 	// TODO read component elaboration info based on a component node
 	private String readSpecificElaboration(ComponentInfo ci) {
-		return "";
+		return ""; //TODO
 	}
 
 	// read all properties into the table
@@ -204,10 +205,24 @@ public class ConfigReader {
 		case "bool":
 			obj = Boolean.valueOf(val);
 			break;
+		case "list":
+			obj = getGetListFromStringList(val.split("|"),"type");//TODO better regex
+			break;
 		default:
 			System.err.println("Unrecognized type '" + type + "'");
 		}
 		return obj;
+	}
+	
+	private Object getGetListFromStringList(String[] strList, String type){
+		
+		ArrayList<Object> list = new ArrayList<Object>();
+		
+		for(String str : strList){
+			list.add(stringToType(str, type));
+		}
+		
+		return list;
 	}
 
 	// Create and return the appropriate reader
@@ -231,6 +246,20 @@ public class ConfigReader {
 	
 	public Object getProperty(String compArchName, String property){
 		return compInfoMap.get(compArchName).PropertyList.get(property);
+	}
+	
+	/*TODO get array size: "compname#" + index */
+	public int getArrayListSize(String compArrayArchName){
+		int size = 0;
+		/*Debug
+		System.out.println("getArrayListSize started");
+		do{
+			System.out.println("Checking: " + compArrayArchName + "#" + Integer.valueOf(size));
+		}
+		//*/
+		while(compInfoMap.containsKey(compArrayArchName + "#" + Integer.valueOf(size++)));
+		
+		return size-1;
 	}
 }
 
