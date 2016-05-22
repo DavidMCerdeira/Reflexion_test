@@ -1,17 +1,15 @@
 import reflexion_test.Processor;
 import reflexion_test.SpecificConfigReader;
 
-
 //must be public
-public class P8051 extends AbstractProcessor {
+public class P8051 {
 	
 	int i2cClk;
 	int spiClk;
 	SpecificConfigReader ConfRdr;
-	Processor P;//model object
 
-	public P8051(Processor p){
-		P = p;
+	public P8051(Processor P){
+
 	}
 	
 	public void setConfigReader(SpecificConfigReader cr){
@@ -22,7 +20,7 @@ public class P8051 extends AbstractProcessor {
 	}
 
 	private void config(){
-		i2cClk = (Integer)ConfRdr.getProperty("c");
+		i2cClk = Math.round((Float)ConfRdr.getProperty("e"));
 	}
 	
 //	public void setI2cClk(int p){

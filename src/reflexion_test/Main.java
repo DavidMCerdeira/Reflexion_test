@@ -29,7 +29,7 @@ public class Main {
 		}
 		
 		Object obj = sl.LoadElaborator(elab);
-//		sl.setConfigReader(obj, er);
-//		sl.elaborate(obj);
+		sl.setConfigReader(obj, er);
+		sl.elaborate(obj);
 	}
 }

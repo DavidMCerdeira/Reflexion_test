@@ -209,29 +209,6 @@ public class ConfigReader {
 		}
 		return obj;
 	}
-		
-//	// search for the default value in node list
-//	private String getDefaultValue(NodeList nL) {
-//		int length = nL.getLength(); // number of child nodes
-//		Node item; // temporary node
-//		for (int i = 0; i < length; i++) {
-//			item = nL.item(i);
-//			if (item instanceof Element) { // make sure its the type of node we
-//											// need
-//				if (item.getNodeName() == "defaultValue") { // we are looking
-//															// for
-//															// the default
-//															// values
-//					// System.out.println(
-//					// "Node name: " + item.getNodeName() + " → " + ((Element)
-//					// item).getAttribute("value"));
-//					return ((Element) item).getAttribute("value");
-//				}
-//			}
-//		}
-//
-//		return "";
-//	}
 
 	// Cast value to the right type
 	private Object stringToType(String val, String type) {
@@ -253,17 +230,6 @@ public class ConfigReader {
 			System.err.println("Unrecognized type '" + type + "'");
 		}
 		return obj;
-	}
-
-	private Object getGetListFromStringList(String[] strList, String type) {
-
-		ArrayList<Object> list = new ArrayList<Object>();
-
-		for (String str : strList) {
-			list.add(stringToType(str, type));
-		}
-
-		return list;
 	}
 
 	// Create and return the appropriate reader

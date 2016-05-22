@@ -6,10 +6,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 public class SpecificLoader {
 	String m_Path = "/mnt/Data/Universidade/MESTRADO_EEIC/EMBEBIDOS/EmbSys-2/Carlos-git/elaborator_xml_test/reflexion_test/HE/SpecificElaborations/";
 
 	ClassLoader cl = null;
+	// Compile source file.
+	JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
 	public SpecificLoader(String path) {
 		//m_Path = path;
@@ -28,6 +33,7 @@ public class SpecificLoader {
 	}
 
 	public Object LoadElaborator(String compName) {
+		compiler.run(null, null, null, m_Path + compName + ".java");
 		Class<?> clss = null;
 		try {
 			clss = cl.loadClass(compName);
@@ -35,7 +41,6 @@ public class SpecificLoader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 
 		Object obj = null;
 		try {
