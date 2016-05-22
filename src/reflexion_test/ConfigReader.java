@@ -45,9 +45,7 @@ public class ConfigReader {
 		 */
 		path = componentArchitecturePath;
 		// */
-		readDirectoryTree(path, 0);// get
-									// current
-									// path
+		readDirectoryTree(path, 0);// get current path
 	}
 
 	// read directory tree so we get all component names, and properties
@@ -83,10 +81,9 @@ public class ConfigReader {
 				compInfoMap.put(compArqName, ci);
 				ci.ArchName = compArqName;
 				ci.ElaborationName = null;
-				readSpecificElaboration(ci);
 				ci.PropertyList = new HashMap<String, Object>();
 
-				readProperties(rootPath, ci);
+				readFields(rootPath, ci);
 			} catch (SAXException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -112,14 +109,9 @@ public class ConfigReader {
 		}
 	}
 
-	// TODO read component elaboration info based on a component node
-	private String readSpecificElaboration(ComponentInfo ci) {
-		return ""; //TODO
-	}
-
 	// read all properties into the table
 	// TODO read component properties info based on a component node
-	private void readProperties(String path, ComponentInfo ci) throws FileNotFoundException, SAXException, IOException {
+	private void readFields(String path, ComponentInfo ci) throws FileNotFoundException, SAXException, IOException {
 		String archName = ci.ArchName;
 		String compName = getNameFromArchName(archName);
 
@@ -128,66 +120,118 @@ public class ConfigReader {
 		File file = new File(fileName); // Open a file
 		Document m_Doc = builder.parse(new FileInputStream(file));
 
-		HashMap<String, Object> tempMap = ci.PropertyList;
+		NodeList comp = m_Doc.getElementsByTagName("component"); // get all
+																	// elements
+																	// with
+																	// tag:
+																	// property
+		if (comp.getLength() > 1) {
+			System.err.println("Too many components");
+			return;
+		}
 
-		NodeList list = m_Doc.getElementsByTagName("property"); // get all
-																// elements with
-																// tag: property
-		Node tempNode = null; // Auxiliary iterator
-		Element elmnt; // Auxiliary so we don't have to cast multiple times
-		NodeList nL; // Auxiliary list for child nodes
-		String value, type, name = null; // parameters needed
-		Object obj; // returned object
+		Node field = null; // Auxiliary iterator
 
-		int nNodes = list.getLength();// number of properties
+		NodeList fields = comp.item(0).getChildNodes();
+		int nNodes = fields.getLength();
 		for (int i = 0; i < nNodes; i++) { // iterator over all properties
-			tempNode = list.item(i);// current node
-			if (tempNode.getNodeType() == Node.ELEMENT_NODE) { // make sure the
-																// node is of
-																// type element
-				elmnt = (Element) tempNode; // make a cast to alleviate syntax
+			field = fields.item(i);// current node
+			if (field.getNodeType() == Node.ELEMENT_NODE) { // make sure the
+															// node is of
+															// type element
+				if (field.getNodeName() == "properties") {
+					// System.out.println("Reading property");
+					readProperties((NodeList) field, ci); // read a property
+				} else if (field.getNodeName() == "elaboration") {
+					// System.out.print("Reading elaboration: ");
+					ci.ElaborationName = ((Element) field).getAttribute("name");
+					// ystem.out.println(ci.ElaborationName);
+				}
+			}
+		}
+	}
+
+	private void readProperties(NodeList props, ComponentInfo ci) {
+		String name = null; // parameters needed
+		Object obj = null; // returned object
+		Element prop = null;
+		int size = props.getLength();
+
+		for (int i = 0; i < size; i++) {
+			if (props.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				prop = (Element) props.item(i);
 				// read the necessary fields
-				name = elmnt.getAttribute("name");
-				type = elmnt.getAttribute("type");
+				name = prop.getAttribute("name");
+				obj = getObjectFromProperty(prop);
+				System.out.println(name + " = " + obj);
+				ci.PropertyList.put(name, obj); // put property into
+												// component
+			}
+		}
+	}
 
-				nL = tempNode.getChildNodes(); // list with child nodes so we
-												// can read defaultValue
-				value = getDefaultValue(nL); // read the default value from
-												// child nodes
+	private Object getObjectFromProperty(Element prop) {
+		Object obj = null;
+		String value, type, subtype = null;
+		type = prop.getAttribute("type");
+		if (type.equals("list")) {
+			subtype = prop.getAttribute("subtype");
+			NodeList nl = prop.getChildNodes();
+			int size = nl.getLength();
+			ArrayList<Object> list = new ArrayList<Object>();
+			for(int i = 0; i < size; i++){
+				if(nl.item(i).getNodeType() == Node.ELEMENT_NODE){
+					list.add(getAtomicProperty((Element)nl.item(i), subtype));
+				}
+			}
+			obj = (Object)list;
+		} else {
+			obj = getAtomicProperty(prop, type);
+		}
+		return obj;
+	}
+
+	private Object getAtomicProperty(Element prop, String type){
+		Object obj = null;
+		String value = prop.getTextContent();
+		if (!value.equals("")) {
+			obj = stringToType(value, type); // convert from string to
+												// the right type
+		} else {
+			value = prop.getAttribute("defaultValue");
+			if (!value.equals("")) {
 				if (value != "") {
-					obj = stringToType(value, type); // convert from string to
-														// the right type
-					System.out.println(type + " " + name + " = " + value);
-					tempMap.put(name, obj); // put property into
-											// component
+					obj = stringToType(value, type);
+				} else {
+					obj = null;
 				}
 			}
 		}
+		return obj;
 	}
-
-	// search for the default value in node list
-	private String getDefaultValue(NodeList nL) {
-		int length = nL.getLength(); // number of child nodes
-		Node item; // temporary node
-		for (int i = 0; i < length; i++) {
-			item = nL.item(i);
-			if (item instanceof Element) { // make sure its the type of node we
-											// need
-				if (item.getNodeName() == "defaultValue") { // we are looking
-															// for
-															// the default
-															// values
-					// System.out.println(
-					// "Node name: " + item.getNodeName() + " → " + ((Element)
-					// item).getAttribute("value"));
-					return ((Element) item).getAttribute("value");
-				}
-			}
-		}
-
-		return "";
-
-	}
+		
+//	// search for the default value in node list
+//	private String getDefaultValue(NodeList nL) {
+//		int length = nL.getLength(); // number of child nodes
+//		Node item; // temporary node
+//		for (int i = 0; i < length; i++) {
+//			item = nL.item(i);
+//			if (item instanceof Element) { // make sure its the type of node we
+//											// need
+//				if (item.getNodeName() == "defaultValue") { // we are looking
+//															// for
+//															// the default
+//															// values
+//					// System.out.println(
+//					// "Node name: " + item.getNodeName() + " → " + ((Element)
+//					// item).getAttribute("value"));
+//					return ((Element) item).getAttribute("value");
+//				}
+//			}
+//		}
+//
+//		return "";
+//	}
 
 	// Cast value to the right type
 	private Object stringToType(String val, String type) {
@@ -205,23 +249,20 @@ public class ConfigReader {
 		case "bool":
 			obj = Boolean.valueOf(val);
 			break;
-		case "list":
-			obj = getGetListFromStringList(val.split("|"),"type");//TODO better regex
-			break;
 		default:
 			System.err.println("Unrecognized type '" + type + "'");
 		}
 		return obj;
 	}
-	
-	private Object getGetListFromStringList(String[] strList, String type){
-		
+
+	private Object getGetListFromStringList(String[] strList, String type) {
+
 		ArrayList<Object> list = new ArrayList<Object>();
-		
-		for(String str : strList){
+
+		for (String str : strList) {
 			list.add(stringToType(str, type));
 		}
-		
+
 		return list;
 	}
 
@@ -231,35 +272,34 @@ public class ConfigReader {
 	}
 
 	// Get the name of the Elaboration class
-	public String getElabName(String archName){
+	public String getElabName(String archName) {
 		return compInfoMap.get(archName).ElaborationName;
 	}
-	
+
 	// Get a components name based on it's architectural name
 	public String getNameFromArchName(String archName) {
-		System.out.println("Component: " + archName);
 		String[] arqNameSplitd = archName.split("\\."); // Match the '.'
 														// caracter
 		int len = arqNameSplitd.length;
 		return arqNameSplitd[len - 1];
 	}
-	
-	public Object getProperty(String compArchName, String property){
+
+	public Object getProperty(String compArchName, String property) {
 		return compInfoMap.get(compArchName).PropertyList.get(property);
 	}
-	
-	/*TODO get array size: "compname#" + index */
-	public int getArrayListSize(String compArrayArchName){
+
+	/* TODO get array size: "compname#" + index */
+	public int getArrayListSize(String compArrayArchName) {
 		int size = 0;
-		/*Debug
-		System.out.println("getArrayListSize started");
-		do{
-			System.out.println("Checking: " + compArrayArchName + "#" + Integer.valueOf(size));
-		}
-		//*/
-		while(compInfoMap.containsKey(compArrayArchName + "#" + Integer.valueOf(size++)));
-		
-		return size-1;
+		/*
+		 * Debug System.out.println("getArrayListSize started"); do{
+		 * System.out.println("Checking: " + compArrayArchName + "#" +
+		 * Integer.valueOf(size)); } //
+		 */
+		while (compInfoMap.containsKey(compArrayArchName + "#" + Integer.valueOf(size++)))
+			;
+
+		return size - 1;
 	}
 }
 

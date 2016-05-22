@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-	<component name="CI">
+	<component name="D">
+		<elaboration name="asdf"/>
 		<properties>
+			<property type="float" name="c" defaultValue="123">12.0</property>
+			<property type="string" name="d" defaultValue="123">"KEK"</property>
 		</properties>
 	</component>
-

@@ -17,17 +17,19 @@ public class Main {
 		
 		SpecificConfigReader er = null;
 		ConfigReader cr = null;
+		String elab = null;
 		try {
 			cr = new ConfigReader("");
 			er = cr.getConfigReader("CI.SCa");
+			elab = cr.getElabName("CI.SCa");
 			System.out.println("array is of size: " + cr.getArrayListSize("CI.array"));
 		} catch (ParserConfigurationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
-		Object obj = sl.LoadElaborator("P8051");
-		sl.setConfigReader(obj, er);
-		sl.elaborate(obj);
+		Object obj = sl.LoadElaborator(elab);
+//		sl.setConfigReader(obj, er);
+//		sl.elaborate(obj);
 	}
 }

@@ -22,7 +22,7 @@ public class P8051 extends AbstractProcessor {
 	}
 
 	private void config(){
-		i2cClk = (Integer)ConfRdr.getProperty("Pa");
+		i2cClk = (Integer)ConfRdr.getProperty("c");
 	}
 	
 //	public void setI2cClk(int p){
