@@ -28,7 +28,7 @@ public class Main {
 			e1.printStackTrace();
 		}
 		
-		Object obj = sl.LoadElaborator(elab);
+		Object obj = sl.LoadElaborator(elab, new Object());
 		sl.setConfigReader(obj, er);
 		sl.elaborate(obj);
 	}

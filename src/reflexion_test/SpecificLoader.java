@@ -1,5 +1,6 @@
 package reflexion_test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -32,7 +33,7 @@ public class SpecificLoader {
 		cl = new URLClassLoader(urls);
 	}
 
-	public Object LoadElaborator(String compName) {
+	public Object LoadElaborator(String compName, Object parameter) {
 		compiler.run(null, null, null, m_Path + compName + ".java");
 		Class<?> clss = null;
 		try {
@@ -44,8 +45,21 @@ public class SpecificLoader {
 
 		Object obj = null;
 		try {
-			obj = clss.newInstance();
+			Constructor<?> constr = clss.getConstructor(new Class[]{Object.class});
+			obj = constr.newInstance(parameter);
 		} catch (InstantiationException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<component name="D">
+		<elaboration name="asdf"/>
+		<properties>
+			<property type="float" name="a" defaultValue="123">12.0</property>
+			<property type="string" name="b" defaultValue="123">KEK</property>
+			<property type="list" subtype="string" name="b">
+				<element>abcd</element>
+				<element>efgh</element>
+			</property>
+		</properties>
+	</component>

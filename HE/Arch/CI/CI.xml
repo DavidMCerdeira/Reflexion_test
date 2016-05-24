@@ -1,13 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-	<component name="D">
-		<elaboration name="asdf"/>
-		<properties>
-			<property type="float" name="a" defaultValue="123">12.0</property>
-			<property type="string" name="b" defaultValue="123">KEK</property>
-			<property type="list" subtype="string" name="b">
-				<element>abcd</element>
-				<element>efgh</element>
-			</property>
-		</properties>
-	</component>
+<component name="One">
+	<elaboration>one</elaboration>
+	<properties>
+		<property type="int" name="a" defaultValue="2"></property>
+		<property type="range" subtype="int" name="b" defaultValue="">
+			<botValue>0</botValue>
+			<topValue>50"</topValue>
+		</property>
+		<property type="list" subtype="int" name="c" defaultValue="">
+			<element>1</element>
+			<element>2</element>
+			<element>3</element>
+			<element>4</element>
+			<element>5</element>
+		</property>
+		<property type="float" name="d" defaultValue="3.25"></property>
+		<property type="range" subtype="float" name="e" defaultValue="">
+			<botValue>0.0</botValue>
+			<topValue>"100.25</topValue>
+		</property>
+		<property type="list" subtype="float" name="f" defaultValue="">
+			<element>1.25</element>
+			<element>2.25</element>
+			<element>3.25</element>
+			<element>4.25</element>
+		</property>
+		<property type="string" name="h" defaultValue="one"></property>
+		<property type="list" subtype="string" name="i" defaultValue="">
+			<element>o</element>
+			<element>n</element>
+			<element>e</element>
+		</property>
+		<property type="bool" name="j" defaultValue="true"></property>
+	</properties>
+</component>

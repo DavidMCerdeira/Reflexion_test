@@ -10,7 +10,7 @@ public class P8051 {
 	Processor p;
 
 	public P8051(Object P){
-		p = (Processor) P;
+		p = P;
 	}
 	
 	public void setConfigReader(SpecificConfigReader cr){

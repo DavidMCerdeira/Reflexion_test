@@ -179,19 +179,19 @@ public class ConfigReader {
 			NodeList nl = prop.getChildNodes();
 			int size = nl.getLength();
 			ArrayList<Object> list = new ArrayList<Object>();
-			for(int i = 0; i < size; i++){
-				if(nl.item(i).getNodeType() == Node.ELEMENT_NODE){
-					list.add(getAtomicProperty((Element)nl.item(i), subtype));
+			for (int i = 0; i < size; i++) {
+				if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
+						list.add(getAtomicProperty((Element) nl.item(i), subtype));
 				}
 			}
-			obj = (Object)list;
+			obj = (Object) list;
 		} else {
 			obj = getAtomicProperty(prop, type);
 		}
 		return obj;
 	}
 
-	private Object getAtomicProperty(Element prop, String type){
+	private Object getAtomicProperty(Element prop, String type) {
 		Object obj = null;
 		String value = prop.getTextContent();
 		if (!value.equals("")) {
