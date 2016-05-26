@@ -17,10 +17,9 @@
 				<bot>1</bot>
 				<top>5</top>
 			</restriction>
-			<defaultValue>
-				<element>23</element>		
-				<element>23</element>			
-				<element>23</element>				
+			<defaultValue>		
+				<element>23</element>
+				<element>23</element>							
 			</defaultValue>
 		</property>
 	</properties>

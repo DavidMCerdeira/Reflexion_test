@@ -19,7 +19,7 @@ public class Main {
 		ConfigReader cr = null;
 		String elab = null;
 		try {
-			cr = new ConfigReader("");
+			cr = new ConfigReader("", "");
 			er = cr.getConfigReader("CI.SCa");
 			elab = cr.getElabName("CI.SCa");
 			System.out.println("array is of size: " + cr.getArrayListSize("CI.array"));
@@ -28,8 +28,8 @@ public class Main {
 			e1.printStackTrace();
 		}
 		
-		Object obj = sl.LoadElaborator(elab, new Processor());
-		sl.setConfigReader(obj, er);
-		sl.elaborate(obj);
+//		Object obj = sl.LoadElaborator(elab, new Processor());
+//		sl.setConfigReader(obj, er);
+//		sl.elaborate(obj);
 	}
 }

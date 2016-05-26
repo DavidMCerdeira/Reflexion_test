@@ -30,34 +30,29 @@ public class ConfigReader {
 
 	String pathDelimeter = "/";
 	String componentArchitecturePath = "/mnt/Data/Universidade/MESTRADO_EEIC/EMBEBIDOS/EmbSys-2/Carlos-git/elaborator_xml_test/reflexion_test/HE/Arch/";
-
+	String componenteSpecificConfigPath = "/mnt/Data/Universidade/MESTRADO_EEIC/EMBEBIDOS/EmbSys-2/Carlos-git/elaborator_xml_test/reflexion_test/HE/Elaborations/";
 	// Initialize Class
-	ConfigReader(String path) throws ParserConfigurationException {
+	ConfigReader(String configPath, String specificConfigRootPath) throws ParserConfigurationException {
 		if (builder == null) { // if there's no builder, build one
 			builder = factory.newDocumentBuilder();
 		}
 
 		compInfoMap = new HashMap<String, ComponentInfo>();
-		/*
-		 * try { path = (path == null) ?
-		 * getClass().getResource("").toURI().getPath() : path; } catch
-		 * (URISyntaxException e) { // TODO Auto-generated catch block
-		 * e.printStackTrace(); } /
-		 */
-		path = componentArchitecturePath;
-		// */
-		readDirectoryTree(path, 0);// get current path
+		//componentArchitecturePath = configPath;
+		//componenteSpecificConfigPath = specificConfigRootPath;
+		
+		readDirectoryTree(componentArchitecturePath, 0);// get current path
 	}
 
 	// read directory tree so we get all component names, and properties
-	private void readDirectoryTree(String rootPath, int level) {
-		File file = new File(rootPath); // current folder
+	private void readDirectoryTree(String configRootPath, int level) {
+		File file = new File(configRootPath); // current folder
 		File tFile = null; // temporary file to iterate all files
 		String filePath = null; // next file path holder
 
 		if (!file.isDirectory()) { // if this file object doesn't represent a
 									// folder
-			System.err.println(rootPath + " is not a directory!");
+			System.err.println(configRootPath + " is not a directory!");
 			return;
 		}
 
@@ -68,7 +63,7 @@ public class ConfigReader {
 								// architecture name: ex Comp.Sub
 
 		if (level != 0) {// this folder doesn't represent a component
-			folderList = rootPath.split(pathDelimeter); // split path into
+			folderList = configRootPath.split(pathDelimeter); // split path into
 														// folders
 			// build component architecture name
 			for (int i = level; i > 0; i--) {
@@ -83,8 +78,8 @@ public class ConfigReader {
 				ci.ArchName = compArqName;
 				ci.ElaborationName = null;
 				ci.PropertyList = new HashMap<String, Object>();
-
-				readFields(rootPath, ci);
+				readFields(configRootPath, ci);
+				
 			} catch (SAXException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -94,7 +89,7 @@ public class ConfigReader {
 		// iterate over files searching for folders. Folders represent
 		// components
 		for (String name : names) {
-			filePath = rootPath + name;
+			filePath = configRootPath + name;
 			// System.out.println(filePath);
 
 			tFile = new File(filePath);
@@ -121,42 +116,86 @@ public class ConfigReader {
 		File file = new File(fileName); // Open a file
 		Document m_Doc = builder.parse(new FileInputStream(file));
 
-		NodeList comp = m_Doc.getElementsByTagName("component"); // get all
-																	// elements
-																	// with
-																	// tag:
-																	// property
+		// get all elements with tag property
+		NodeList comp = m_Doc.getElementsByTagName("component");
 		if (comp.getLength() > 1) {
 			System.err.println("Too many components");
 			return;
 		}
-
-		Node field = null; // Auxiliary iterator
-
+		
+		ci.Type = ((Element) comp.item(0)).getAttribute("name");
+		
+		//System.out.println("Specific of " + ci.Type + "." + ci.getCompName());
+		ci.SpecificPropertyList = readSpecificProperties(ci.Type, ci.getCompName());
+		System.out.println(ci.SpecificPropertyList);
+		
 		NodeList fields = comp.item(0).getChildNodes();
-		int nNodes = fields.getLength();
-		for (int i = 0; i < nNodes; i++) { // iterator over all properties
-			field = fields.item(i);// current node
-			if (field.getNodeType() == Node.ELEMENT_NODE) { // make sure the
-															// node is of
-															// type element
-				if (field.getNodeName() == "properties") {
-					// System.out.println("Reading property");
-					readProperties((NodeList) field, ci); // read a property
-				} else if (field.getNodeName() == "elaboration") {
-					// System.out.print("Reading elaboration: ");
-					ci.ElaborationName = ((Element) field).getAttribute("name");
-					// ystem.out.println(ci.ElaborationName);
-				}
-			}
+		
+		Node temp = getNodeOfName(fields, "properties");
+		if(temp != null){
+			ci.PropertyList = readProperties(temp.getChildNodes());
+		}
+		temp = getNodeOfName(fields, "elaboration");
+		if(temp != null){
+			ci.ElaborationName = temp.getTextContent();
 		}
 	}
+	
+	private HashMap<String, Object> readSpecificProperties(String type, String name){
+		
+		String fileName = componenteSpecificConfigPath + type + pathDelimeter + name + ".xml";
+		// System.out.println("File name: " + fileName);
+		File file = new File(fileName); // Open a file
+		Document m_Doc = null;
+		if(!file.canRead()){
+			return null;
+		}
+		
+		try {
+			m_Doc = builder.parse(new FileInputStream(file));
+		} catch (SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-	private void readProperties(NodeList props, ComponentInfo ci) {
+		// get all elements with tag property
+		NodeList comp = m_Doc.getElementsByTagName("component");
+		if (comp.getLength() > 1) {
+			System.err.println("Too many components");
+			return null;
+		}
+		
+		NodeList fields = comp.item(0).getChildNodes();
+		
+		Node temp = getNodeOfName(fields, "properties");
+		if(temp != null){
+			return readProperties(temp.getChildNodes());
+		}
+		
+		return null;
+	}
+	
+	private Node getNodeOfName(NodeList nl, String name){
+		int nNodes = nl.getLength();
+		Node n = null;
+		for (int i = 0; i < nNodes; i++) { // iterate over all properties
+			n = nl.item(i);// current node
+			// make sure the node is of type element
+			if (n.getNodeType() == Node.ELEMENT_NODE) {
+				if (n.getNodeName().equals(name)) {
+						return n; // read a property
+				} 
+			}
+		}
+		return n;
+	}
+
+	private HashMap<String, Object> readProperties(NodeList props) {
 		String name = null; // parameters needed
 		Object obj = null; // returned object
 		Element prop = null;
 		int size = props.getLength();
+		HashMap<String, Object> list = new HashMap<String, Object>();
 
 		for (int i = 0; i < size; i++) {
 			if (props.item(i).getNodeType() == Node.ELEMENT_NODE) {
@@ -165,17 +204,18 @@ public class ConfigReader {
 				name = prop.getAttribute("name");
 				obj = getObjectFromProperty(prop);
 				System.out.println(name + " = " + obj);
-				ci.PropertyList.put(name, obj); // put property into
+				list.put(name, obj); // put property into
 												// component
 			}
 		}
+		return list;
 	}
 
 	private Object getObjectFromProperty(Element prop) {
 		String type, subtype = null;
 		type = prop.getAttribute("type");
 		Node dv = getDefaultValueNode(prop);
-		
+
 		if (type.equals("array")) {
 			System.out.println("Array!");
 			subtype = prop.getAttribute("subtype");
@@ -185,14 +225,14 @@ public class ConfigReader {
 			Node n = null;
 			int size = nl.getLength();
 			ArrayList<Object> list = new ArrayList<Object>();
-			for(int i = 0; i < size; i++){
+			for (int i = 0; i < size; i++) {
 				n = nl.item(i);
-				if(n.getNodeType() == Node.ELEMENT_NODE){
-					if(elementCounter > maxElements){
+				if (n.getNodeType() == Node.ELEMENT_NODE) {
+					if (elementCounter > maxElements) {
 						System.err.println("Too many elements on array");
 					}
 					System.out.println("Element: " + elementCounter + " - " + n.getTextContent());
-					list.add(stringToType(n.getTextContent(),subtype));
+					list.add(stringToType(n.getTextContent(), subtype));
 					elementCounter++;
 				}
 			}
@@ -200,18 +240,17 @@ public class ConfigReader {
 		} else {
 			return stringToType(dv.getTextContent(), type);
 		}
-		
 	}
-	
-	private Node getDefaultValueNode(Element e){
+
+	private Node getDefaultValueNode(Element e) {
 		NodeList nl = e.getChildNodes();
 		int size = nl.getLength();
 		Node n = null;
 		int i = 0;
-		while(i < size){
+		while (i < size) {
 			if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
-				n = (Element)nl.item(i);
-				if(n.getNodeName().equals("defaultValue")){
+				n = (Element) nl.item(i);
+				if (n.getNodeName().equals("defaultValue")) {
 					return n;
 				}
 			}
@@ -219,11 +258,11 @@ public class ConfigReader {
 		}
 		return null;
 	}
-	
+
 	// Cast value to the right type
 	private Object stringToType(String val, String type) {
 		Object obj = null;
-		if(val.equals(""))
+		if (val.equals(""))
 			return null;
 		switch (type) {
 		case "int":
@@ -246,7 +285,7 @@ public class ConfigReader {
 
 	// Create and return the appropriate reader
 	public SpecificConfigReader getConfigReader(String compArchName) {
-		return new SpecificConfigReader(compInfoMap.get(compArchName).PropertyList);
+		return new SpecificConfigReader(compInfoMap.get(compArchName).SpecificPropertyList);
 	}
 
 	// Get the name of the Elaboration class
@@ -283,6 +322,18 @@ public class ConfigReader {
 
 class ComponentInfo {
 	String ArchName; // Component name in the reference architecture
+	String Type;
 	String ElaborationName; // Elaboration name
 	HashMap<String, Object> PropertyList; // List of component properties
+	HashMap<String, Object> SpecificPropertyList;
+	
+	public String getCompName(){
+		String str[] =  ArchName.split("\\.");
+		int len = str.length;
+		
+		if(len == 1)
+			return ArchName;
+		
+		return str[len-1];
+	}
 }
