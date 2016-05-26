@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.crypto.Cipher;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -171,48 +172,59 @@ public class ConfigReader {
 	}
 
 	private Object getObjectFromProperty(Element prop) {
-		Object obj = null;
-		String value, type, subtype = null;
+		String type, subtype = null;
 		type = prop.getAttribute("type");
-		if (type.equals("list")) {
+		Node dv = getDefaultValueNode(prop);
+		
+		if (type.equals("array")) {
+			System.out.println("Array!");
 			subtype = prop.getAttribute("subtype");
-			NodeList nl = prop.getChildNodes();
+			int maxElements = Integer.valueOf(prop.getAttribute("size"));
+			int elementCounter = 0;
+			NodeList nl = dv.getChildNodes();
+			Node n = null;
 			int size = nl.getLength();
 			ArrayList<Object> list = new ArrayList<Object>();
-			for (int i = 0; i < size; i++) {
-				if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
-						list.add(getAtomicProperty((Element) nl.item(i), subtype));
+			for(int i = 0; i < size; i++){
+				n = nl.item(i);
+				if(n.getNodeType() == Node.ELEMENT_NODE){
+					if(elementCounter > maxElements){
+						System.err.println("Too many elements on array");
+					}
+					System.out.println("Element: " + elementCounter + " - " + n.getTextContent());
+					list.add(stringToType(n.getTextContent(),subtype));
+					elementCounter++;
 				}
 			}
-			obj = (Object) list;
+			return list;
 		} else {
-			obj = getAtomicProperty(prop, type);
+			return stringToType(dv.getTextContent(), type);
 		}
-		return obj;
+		
 	}
-
-	private Object getAtomicProperty(Element prop, String type) {
-		Object obj = null;
-		String value = prop.getTextContent();
-		if (!value.equals("")) {
-			obj = stringToType(value, type); // convert from string to
-												// the right type
-		} else {
-			value = prop.getAttribute("defaultValue");
-			if (!value.equals("")) {
-				if (value != "") {
-					obj = stringToType(value, type);
-				} else {
-					obj = null;
+	
+	private Node getDefaultValueNode(Element e){
+		NodeList nl = e.getChildNodes();
+		int size = nl.getLength();
+		Node n = null;
+		int i = 0;
+		while(i < size){
+			if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				n = (Element)nl.item(i);
+				if(n.getNodeName().equals("defaultValue")){
+					return n;
 				}
 			}
+			i++;
 		}
-		return obj;
+		return null;
 	}
-
+	
 	// Cast value to the right type
 	private Object stringToType(String val, String type) {
 		Object obj = null;
+		if(val.equals(""))
+			return null;
 		switch (type) {
 		case "int":
 			obj = Integer.valueOf(val);

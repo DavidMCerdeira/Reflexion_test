@@ -32,8 +32,8 @@ public class SpecificLoader {
 		URL[] urls = new URL[] { url };
 		cl = new URLClassLoader(urls);
 	}
-
-	public Object LoadElaborator(String compName, Object parameter) {
+	
+	public Class<?> getElaboratorClass(String compName){
 		compiler.run(null, null, null, m_Path + compName + ".java");
 		Class<?> clss = null;
 		try {
@@ -42,6 +42,12 @@ public class SpecificLoader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return clss;
+	}
+
+	public Object LoadElaborator(String compName, Object parameter) {
+		
+		Class<?> clss = getElaboratorClass(compName);
 
 		Object obj = null;
 		try {

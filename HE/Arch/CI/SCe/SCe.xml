@@ -3,7 +3,25 @@
 	<component name="D">
 		<elaboration name="asdf"/>
 		<properties>
-			<property type="float" name="g" defaultValue="123">12.0</property>
-			<property type="string" name="h" defaultValue="123">"KEK"</property>
-		</properties>
+		<property type="int" name="c">
+			<restriction type="list">
+				<element>1</element>
+				<element>2</element>
+				<element>3</element>
+			</restriction>
+			<defaultValue></defaultValue>
+		</property>
+
+		<property type="array" subtype="int" size="3" name="c">
+			<restriction type="range">						
+				<bot>1</bot>
+				<top>5</top>
+			</restriction>
+			<defaultValue>
+				<element>23</element>		
+				<element>23</element>			
+				<element>23</element>				
+			</defaultValue>
+		</property>
+	</properties>
 	</component>
