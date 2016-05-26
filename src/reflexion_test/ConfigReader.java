@@ -284,7 +284,7 @@ public class ConfigReader {
 	}
 
 	// Create and return the appropriate reader
-	public SpecificConfigReader getConfigReader(String compArchName) {
+	public SpecificConfigReader getSpecificConfigReader(String compArchName) {
 		return new SpecificConfigReader(compInfoMap.get(compArchName).SpecificPropertyList);
 	}
 

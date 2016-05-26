@@ -20,7 +20,7 @@ public class Main {
 		String elab = null;
 		try {
 			cr = new ConfigReader("", "");
-			er = cr.getConfigReader("CI.SCa");
+			er = cr.getSpecificConfigReader("CI.SCa");
 			elab = cr.getElabName("CI.SCa");
 			System.out.println("array is of size: " + cr.getArrayListSize("CI.array"));
 		} catch (ParserConfigurationException e1) {
