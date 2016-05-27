@@ -1,4 +1,4 @@
-package reflexion_test;
+package Processor;
 
 public class Processor {
 	protected int Clock;

@@ -1,16 +1,13 @@
-package reflexion_test;
+package ConfigReader;
 
-import reflexion_test.SpecificConfigReader;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.crypto.Cipher;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,7 +29,7 @@ public class ConfigReader {
 	String componentArchitecturePath = "/mnt/Data/Universidade/MESTRADO_EEIC/EMBEBIDOS/EmbSys-2/Carlos-git/elaborator_xml_test/reflexion_test/HE/Arch/";
 	String componenteSpecificConfigPath = "/mnt/Data/Universidade/MESTRADO_EEIC/EMBEBIDOS/EmbSys-2/Carlos-git/elaborator_xml_test/reflexion_test/HE/Elaborations/";
 	// Initialize Class
-	ConfigReader(String configPath, String specificConfigRootPath) throws ParserConfigurationException {
+	public ConfigReader(String configPath, String specificConfigRootPath) throws ParserConfigurationException {
 		if (builder == null) { // if there's no builder, build one
 			builder = factory.newDocumentBuilder();
 		}
@@ -290,7 +287,7 @@ public class ConfigReader {
 
 	// Get the name of the Elaboration class
 	public String getElabName(String archName) {
-		return compInfoMap.get(archName).ElaborationName;
+		return compInfoMap.get(archName).getFullElabName();
 	}
 
 	// Get a components name based on it's architectural name
@@ -335,5 +332,9 @@ class ComponentInfo {
 			return ArchName;
 		
 		return str[len-1];
+	}
+	
+	public String getFullElabName(){
+		return Type + "." +  ElaborationName;
 	}
 }

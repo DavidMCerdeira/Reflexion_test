@@ -1,5 +1,5 @@
-import reflexion_test.Processor;
-import reflexion_test.SpecificConfigReader;
+import Processor.Processor;
+import ConfigReader.SpecificConfigReader;
 
 //must be public
 public class P8051 {

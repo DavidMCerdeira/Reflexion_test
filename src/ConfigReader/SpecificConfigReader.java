@@ -1,4 +1,5 @@
-package reflexion_test;
+package ConfigReader;
+
 
 import java.util.HashMap;
 

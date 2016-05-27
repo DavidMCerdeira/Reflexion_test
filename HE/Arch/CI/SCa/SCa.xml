@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-	<component name="D">
-		<elaboration name="P8051"/>
+	<component name="Processor">
+		<elaboration>P8051</elaboration>
 		<properties>
 		<property type="int" name="c">
 			<restriction type="list">

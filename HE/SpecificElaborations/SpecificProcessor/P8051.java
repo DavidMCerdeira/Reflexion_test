@@ -1,5 +1,7 @@
-import reflexion_test.Processor;
-import reflexion_test.SpecificConfigReader;
+package SpecificProcessor;
+
+import Processor.Processor;
+import ConfigReader.SpecificConfigReader;
 
 //must be public
 public class P8051 {
@@ -10,7 +12,7 @@ public class P8051 {
 	Processor p;
 
 	public P8051(Object P){
-		p = P;
+		p = (Processor) P;
 	}
 	
 	public void setConfigReader(SpecificConfigReader cr){

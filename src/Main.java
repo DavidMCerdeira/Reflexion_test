@@ -1,14 +1,11 @@
-package reflexion_test;
 
-import reflexion_test.SpecificLoader;
-import reflexion_test.ConfigReader;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import reflexion_test.SpecificConfigReader;
+import ConfigReader.ConfigReader;
+import ConfigReader.SpecificConfigReader;
+import Loader.SpecificLoader;
+import Processor.Processor;
 
 public class Main {
 	public static void main(String[] args) {
@@ -28,7 +25,7 @@ public class Main {
 			e1.printStackTrace();
 		}
 		
-//		Object obj = sl.LoadElaborator(elab, new Processor());
+		Object obj = sl.LoadElaborator(elab, new Processor());
 //		sl.setConfigReader(obj, er);
 //		sl.elaborate(obj);
 	}
